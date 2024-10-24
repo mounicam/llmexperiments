@@ -1,22 +1,28 @@
 import copy
+import glob
 import torch
 import argparse
 import transformers
 
 
-
 def generate_text(query_text, messages, pipeline):
     content = template_message[-1]["content"] + "\n" + query_text
     messages[-1]["content"] = content
+    print(messages)
+    print("**" * 40)
     output = pipeline(messages, num_return_sequences=1)
     simplified_text = output[0]['generated_text'][-1]["content"]
+    print(simplified_text)
+    print("**" * 40)
     return simplified_text
     
 
 if __name__=="__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_file")
+    parser.add_argument("--prompt_file")
+    parser.add_argument("--input_folder")
+    parser.add_argument("--output_folder")
     args = parser.parse_args()
 
 
@@ -40,15 +46,19 @@ if __name__=="__main__":
     template_message = [
         {
             "role": "system",
-            "content": "You are a professional editor trying to simplify difficult Finnish news articles for non-native speakers at intermediate level of learning Finnish.", 
+            "content": "You are a helpful AI assistant.", 
         },
         {
             "role": "user",
-            "content": "Please simplify the following news article in Finnish. The output text should be in Finnish.",
+            "content": open(args.prompt_file).read().strip(),
         },
     ]
     
-
-    file_context = open(args.input_file).read().strip()
-    print(generate_text(file_context, copy.deepcopy(template_message), pipeline))
+    
+    for fpath in glob.glob(args.input_folder + "/*"):
+        file_context = open(fpath).read().strip()
+        simplified_text = generate_text(file_context, copy.deepcopy(template_message), pipeline)
+        fname = fpath.split("/")[-1]
+        with open(args.output_folder + fname, "w") as fp:
+            fp.write(simplified_text)
     
