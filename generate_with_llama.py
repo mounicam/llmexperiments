@@ -20,9 +20,9 @@ def generate_text(query_text, messages, pipeline):
 if __name__=="__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prompt_file")
-    parser.add_argument("--input_folder")
-    parser.add_argument("--output_folder")
+    parser.add_argument("--prompt_file") # Prompt file that is given to the llama3 model.
+    parser.add_argument("--input_folder") # Input folder path where each file is an advanced document.
+    parser.add_argument("--output_folder") # Output folder for the simplifed documents.
     args = parser.parse_args()
 
 
